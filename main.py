@@ -5,4 +5,6 @@ response = requests.get("https://playground.learnqa.ru/api/long_redirect", allow
 all_responses = response.history # чтобы узнать куда именно нас перенаправили, мы можем вызвать фукцию history. она вернет массив всех
 for i in range(len(all_responses)): # цикл от 0 до количества редиректов (len(all_responses))
     url_response = response.history[i] # в переменную кладем урл
-    print(url_response.url)
+    count = i + 1
+    print(f"Url {count}:", url_response.url)
+print("Количество url:", len(all_responses))
