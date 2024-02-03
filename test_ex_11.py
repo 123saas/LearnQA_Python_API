@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 class TestCookie:
-    def test_method_cocckie(self):
+    def test_method_cookie(self):
         url = "https://playground.learnqa.ru/api/homework_cookie"
         response = requests.get(url)
         cookie_dict = dict(response.cookies) # отображение cookie в виде словаря
