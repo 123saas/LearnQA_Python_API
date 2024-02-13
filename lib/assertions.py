@@ -13,3 +13,46 @@ class Assetions:
         assert name in response_as_dict, f"Response JSON doesn't have key '{name}'"
         assert response_as_dict[name] == expected_value, error_message
 
+# проверка, что такое имя есть в ответе (проверка наличия ключа "id")
+    @staticmethod
+    def assert_json_has_key(response: Response, name):
+        try:
+            response_as_dict = response.json()
+        except json.JSONDecodeError:
+            assert False, f"Response is not in JSON format. Response text is '{response.text}'"
+        assert name in response_as_dict, f"Response JSON doesn't have key '{name}'"
+
+# проверка статус кода
+    @staticmethod
+    def assert_code_status(response: Response, expected_status_code):
+        assert response.status_code == expected_status_code, \
+            f"Непредвиденный статус код! Ожидаемый статус код: {expected_status_code}. Фактический статус код: {response.status_code}"
+
+# проверка, что в ответе нет каки-то полей по названию
+    @staticmethod
+    def assert_json_has_no_key(response: Response, name):
+        try:
+            response_as_dict = response.json()
+        except json.JSONDecodeError:
+            assert False, f"Response is not in JSON format. Response text is '{response.text}'"
+        assert name not in response_as_dict, f"Response JSON shoudn't have key '{name}'. But it's present"
+
+# принимает список значений. проверка, что эти параметры есть в ответе
+    @staticmethod
+    def assert_json_has_keys(response: Response, names: list):
+        try:
+            response_as_dict = response.json()
+        except json.JSONDecodeError:
+            assert False, f"Response is not in JSON format. Response text is '{response.text}'"
+        for name in names: # по этому списку идет с помощью цикла for
+            assert name in response_as_dict, f"Response JSON doesn't have key '{name}'"
+
+# принимает список значений. проверка, что эти параметры есть в ответе
+    @staticmethod
+    def assert_json_has_no_keys(response: Response, names: list):
+        try:
+            response_as_dict = response.json()
+        except json.JSONDecodeError:
+            assert False, f"Response is not in JSON format. Response text is '{response.text}'"
+        for name in names: # по этому списку идет с помощью цикла for
+            assert name not in response_as_dict, f"Response JSON has key '{name}'"
