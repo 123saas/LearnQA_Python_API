@@ -4,6 +4,7 @@ from lib.assertions import Assetions
 import pytest
 import json
 from random import choice
+from datetime import datetime
 
 class TestUserRegister(BaseCase):
 
@@ -43,39 +44,38 @@ class TestUserRegister(BaseCase):
 
     }
 
+
+
+# успешное создание пользователя
+    def test_create_user_successfully(self):
+        data = self.prepare_registration_data()
+
+        response = requests.post("https://playground.learnqa.ru/api/user/", data=data)
+        # assert response.status_code == 200, f"Непредвиденный статус код {response.status_code}"
+        Assetions.assert_code_status(response, 200)
+        Assetions.assert_json_has_key(response, "id")
+
+
     def test_create_user_with_existing_email(self):
         email = 'vinkotov@example.com'
-        data = {
-            'password': '123',
-            'username': 'learnqa',
-            'firstName': 'learnqa',
-            'lastName': 'learnqa',
-            'email': email,
-
-        }
+        data = self.prepare_registration_data(email)
         response = requests.post("https://playground.learnqa.ru/api/user/", data=data)
         # print(response.status_code)
         # print(response.content)
 
-        assert response.status_code == 400, f"Непредвиденный статус код {response.status_code}"
+        Assetions.assert_code_status(response, 400)
         assert response.content.decode("utf-8") == f"Users with email '{email}' already exists", f"Непредвиденный содержание ответа {response.content}"
 
     # Создание пользователя с некорректным email - без символа @
     def test_create_user_without_at_in_email(self):
         email = 'vinkotovexample.com'
-        data = {
-            'password': '123',
-            'username': 'learnqa',
-            'firstName': 'learnqa',
-            'lastName': 'learnqa',
-            'email': email,
+        data = self.prepare_registration_data(email)
 
-        }
         response = requests.post("https://playground.learnqa.ru/api/user/", data=data)
         # print(response.status_code)
         # print(response.content)
 
-        assert response.status_code == 400, f"Непредвиденный статус код {response.status_code}"
+        Assetions.assert_code_status(response, 400)
         assert response.content.decode("utf-8") == "Invalid email format", f"Непредвиденный содержание ответа {response.content}"
 
 # Создание пользователя без указания одного из полей - с помощью @parametrize необходимо проверить, что отсутствие любого параметра не дает зарегистрировать пользователя
@@ -103,7 +103,7 @@ class TestUserRegister(BaseCase):
         # print(response.content)
         # print("missed_params", missed_params)
 
-        assert response.status_code == 400, f"Непредвиденный статус код {response.status_code}"
+        Assetions.assert_code_status(response, 400)
         assert response.content.decode("utf-8") == f"The following required params are missed: {missed_params}", f"Непредвиденный содержание ответа {response.content}"
 
 # Создание пользователя с очень коротким именем в один символ
@@ -120,7 +120,7 @@ class TestUserRegister(BaseCase):
         response = requests.post("https://playground.learnqa.ru/api/user/", data=data_1)
         # print(response.status_code)
         # print(response.content)
-        assert response.status_code == 400, f"Непредвиденный статус код {response.status_code}"
+        Assetions.assert_code_status(response, 400)
         assert response.content.decode("utf-8") == "The value of 'firstName' field is too short", f"Непредвиденный содержание ответа {response.content}"
 
 # Создание пользователя с очень длинным именем - длиннее 250 символов
@@ -138,5 +138,5 @@ class TestUserRegister(BaseCase):
         response = requests.post("https://playground.learnqa.ru/api/user/", data=data_1)
         # print(response.status_code)
         # print(response.content)
-        assert response.status_code == 400, f"Непредвиденный статус код {response.status_code}"
+        Assetions.assert_code_status(response, 400)
         assert response.content.decode("utf-8") == "The value of 'firstName' field is too long", f"Непредвиденный содержание ответа {response.content}"
