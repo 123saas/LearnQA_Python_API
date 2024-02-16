@@ -1,6 +1,7 @@
-import requests
+
 from lib.base_case import BaseCase
 from lib.assertions import Assetions
+from lib.my_requests import MyRequests
 
 # создадим следующий тест:
 # вначале мы будем создавать пользователя, потом его редактировать, а затем проверять, что мы успешно его отредактировали с помощью метода получения данных о пользователе
@@ -15,7 +16,7 @@ class TestUserEdit(BaseCase):
 
         # РЕГИСТРАЦИЯ
         register_data = self.prepare_registration_data() # 1. подготовить данные для создания пользователей, в том числе и его имейла. Генерируем пользователя
-        response1 = requests.post("https://playground.learnqa.ru/api/user/", data=register_data)
+        response1 = MyRequests.post("/user/", data=register_data)
 
         #убедимся, что на запрос, который мы послали сервер ответил кодом ответа 200 и что в ответе есть id нового пользователя:
         Assetions.assert_code_status(response1, 200)
@@ -34,7 +35,7 @@ class TestUserEdit(BaseCase):
             'password': password
         }
 
-        response2 = requests.post("https://playground.learnqa.ru/api/user/login", data=login_data)  # авторизация по дновым пользователем
+        response2 = MyRequests.post("/user/login", data=login_data)  # авторизация по новым пользователем
 
         # вытаскиваем нужные нам значения:
         auth_sid = self.get_cookie(response2, 'auth_sid')
@@ -45,19 +46,19 @@ class TestUserEdit(BaseCase):
         # нам надо сделать запрос типа PUT. В запрос мы должны передать токен, авторизационный куки и поле, которое хотим менять новым значением, а менять мы будем firstname
         new_name = "Change Name"
 
-        response3 = requests.put(f"https://playground.learnqa.ru/api/user/{user_id}",
-                                 headers={'x-csrf-token': token},
-                                 cookies={'auth_sid': auth_sid},
-                                 data={'firstName': new_name})
+        response3 = MyRequests.put(f"/user/{user_id}",
+                                   headers={'x-csrf-token': token},
+                                   cookies={'auth_sid': auth_sid},
+                                   data={'firstName': new_name})
 
         Assetions.assert_code_status(response3, 200)
 
         # ПОЛУЧЕНИЕ
         # получение данных пользователя и сравнение его имени с новым
 
-        response4 = requests.get(f"https://playground.learnqa.ru/api/user/{user_id}",
-                                 headers={'x-csrf-token': token},
-                                 cookies={'auth_sid': auth_sid})
+        response4 = MyRequests.get(f"/user/{user_id}",
+                                   headers={'x-csrf-token': token},
+                                   cookies={'auth_sid': auth_sid})
 
         Assetions.assert_json_value_by_name(response4,
                                             'firstName',
