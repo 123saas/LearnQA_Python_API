@@ -1,6 +1,7 @@
 import requests
+from lib.logger import Logger
 
-class MyRequests():
+class MyRequests:
     # def _send - это приватный метод, поэтому напишем 4 публичных метода
     @staticmethod
     def post(url: str, data: dict=None, headers: dict=None, cookies: dict=None):
@@ -29,6 +30,8 @@ class MyRequests():
         if cookies is None:
             cookies = {} # cookies равно пустой массив
 
+        Logger.add_request(url, data, headers, cookies, method)
+
         # код для выбора метода
         if method == 'GET':
             response = requests.get(url, params=data, headers=headers, cookies=cookies)
@@ -40,5 +43,8 @@ class MyRequests():
             response = requests.delete(url, data=data, headers=headers, cookies=cookies)
         else:
             raise Exception(f"HTTP method '{method}' was received")
+
+        # и перед тем, как возвращать запрос, напишем:
+        Logger.add_response(response)
 
         return response
