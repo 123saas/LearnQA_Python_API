@@ -56,3 +56,12 @@ class Assetions:
             assert False, f"Response is not in JSON format. Response text is '{response.text}'"
         for name in names: # по этому списку идет с помощью цикла for
             assert name not in response_as_dict, f"Response JSON has key '{name}'"
+
+
+# проверка значения заголовка
+    @staticmethod
+    def assert_content_type_header(response: Response, expected_header):
+        response_headers = response.headers
+        content_type = response_headers['Content-Type']
+        assert content_type == expected_header, \
+            f"Некорректный ожидаемый ответ сервера! Фактический ответ сервера: '{response.text}'"

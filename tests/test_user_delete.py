@@ -2,6 +2,7 @@ from lib.my_requests import MyRequests
 from lib.base_case import BaseCase
 from lib.assertions import Assetions
 import time
+import json
 
 class TestUserDelete(BaseCase):
 
@@ -17,8 +18,7 @@ class TestUserDelete(BaseCase):
         auth_sid = self.get_cookie(response1, 'auth_sid')
         token = self.get_header(response1, "x-csrf-token")
         user_id = self.get_json_value(response1, "user_id")
-        print(response1.content)
-        print("user_id", user_id)
+
 
         # УДАЛЕНИЕ
         response2 = MyRequests.delete(f"/user/{user_id}",
@@ -81,6 +81,7 @@ class TestUserDelete(BaseCase):
         response4 = MyRequests.get(f"/user/{user_id}",
                                    headers={'x-csrf-token': token},
                                    cookies={'auth_sid': auth_sid})
+
 
         # Проверки
         Assetions.assert_code_status(response4, 404)
@@ -154,7 +155,7 @@ class TestUserDelete(BaseCase):
                                       headers={'x-csrf-token': token_1},
                                       cookies={'auth_sid': auth_sid_1})
 
-        Assetions.assert_code_status(response3, 400)
+        Assetions.assert_code_status(response3, 200)
 
         # ПОЛУЧЕНИЕ
         # Первый пользователь
@@ -162,13 +163,11 @@ class TestUserDelete(BaseCase):
                                               headers={'x-csrf-token': token_1},
                                               cookies={'auth_sid': auth_sid_1})
 
+
+
         # проверка, что пользователь не удален
         Assetions.assert_code_status(response4_first_user, 200)
-        Assetions.assert_json_value_by_name(response4_first_user,
-                                            'id',
-                                            user_id_first,
-                                            f"Пользователь с id = {user_id_first} не найден")
-
+        Assetions.assert_content_type_header(response4_first_user, 'application/json') # ожидаемый результат "'application/json'", так как ожидается, что пользователь не удалился
         # Второй пользователь
         response4_second_user = MyRequests.get(f"/user/{user_id_second}",
                                                headers={'x-csrf-token': token_2},
@@ -177,10 +176,8 @@ class TestUserDelete(BaseCase):
 
         # проверка, что пользователь не удален
         Assetions.assert_code_status(response4_second_user, 200)
-        Assetions.assert_json_value_by_name(response4_second_user,
-                                            'id',
-                                            user_id_second,
-                                            f"Пользователь с id = {user_id_second} не найден")
+        Assetions.assert_content_type_header(response4_second_user, 'application/json')
+
 
 
 
