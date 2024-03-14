@@ -1,23 +1,35 @@
 import requests
 from lib.logger import Logger
+import allure
+
+
+# Добавим теги в класс MyRequests, чтобы было видно, какие запросы делаются в ходе тестов.
+# Так как методы тут статические, мы не можем использовать декоратор allure с символом @, но мы можем использовать allure несколько иначе
+
+
 
 class MyRequests:
     # def _send - это приватный метод, поэтому напишем 4 публичных метода
     @staticmethod
     def post(url: str, data: dict=None, headers: dict=None, cookies: dict=None):
-        return MyRequests._send(url, data, headers, cookies, 'POST')
+        # констркция with в python называется "менеджером контекста". Она позволяет использовать теги allure внутри функций, а не как декораторы
+        with allure.step(f"POST запрос с URL '{url}'"): # мы добавили для каждого шага, который будет происходить в этой функции, вывод в allure, котором будет записываться, что именно на этом шаге делается
+            return MyRequests._send(url, data, headers, cookies, 'POST')
 
     @staticmethod
     def put(url: str, data: dict = None, headers: dict = None, cookies: dict = None):
-        return MyRequests._send(url, data, headers, cookies, 'PUT')
+        with allure.step(f"PUT запрос с URL '{url}'"):
+            return MyRequests._send(url, data, headers, cookies, 'PUT')
 
     @staticmethod
     def delete(url: str, data: dict = None, headers: dict = None, cookies: dict = None):
-        return MyRequests._send(url, data, headers, cookies, 'DELETE')
+        with allure.step(f"DELETE запрос с URL '{url}'"):
+            return MyRequests._send(url, data, headers, cookies, 'DELETE')
 
     @staticmethod
     def get(url: str, data: dict = None, headers: dict = None, cookies: dict = None):
-        return MyRequests._send(url, data, headers, cookies, 'GET')
+        with allure.step(f"GET запрос с URL '{url}'"):
+            return MyRequests._send(url, data, headers, cookies, 'GET')
 
 
     # сначала сделаем центальный метод send. именно он будет отправлять наши запросы. мы сделаем его статическим, так как класс является вспомогательным и создавать объект этого класса нам не потребуется
@@ -48,3 +60,4 @@ class MyRequests:
         Logger.add_response(response)
 
         return response
+

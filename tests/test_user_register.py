@@ -6,7 +6,9 @@ import json
 from random import choice
 from datetime import datetime
 from lib.my_requests import MyRequests
+import allure
 
+@allure.epic("Кейсы на создание")
 class TestUserRegister(BaseCase):
 
     params_without_password = {
@@ -48,6 +50,7 @@ class TestUserRegister(BaseCase):
 
 
 # успешное создание пользователя
+    @allure.title("Успешное создание пользователя")
     def test_create_user_successfully(self):
         data = self.prepare_registration_data()
 
@@ -56,7 +59,7 @@ class TestUserRegister(BaseCase):
         Assetions.assert_code_status(response, 200)
         Assetions.assert_json_has_key(response, "id")
 
-
+    @allure.title("Создание пользователя с уже используемым email")
     def test_create_user_with_existing_email(self):
         email = 'vinkotov@example.com'
         data = self.prepare_registration_data(email)
@@ -68,6 +71,7 @@ class TestUserRegister(BaseCase):
         assert response.content.decode("utf-8") == f"Users with email '{email}' already exists", f"Непредвиденный содержание ответа {response.content}"
 
     # Создание пользователя с некорректным email - без символа @
+    @allure.title("Создание пользователя с некорректным email - без символа @")
     def test_create_user_without_at_in_email(self):
         email = 'vinkotovexample.com'
         data = self.prepare_registration_data(email)
@@ -79,6 +83,7 @@ class TestUserRegister(BaseCase):
         Assetions.assert_code_status(response, 400)
         assert response.content.decode("utf-8") == "Invalid email format", f"Непредвиденный содержание ответа {response.content}"
 
+    @allure.title("Создание пользователя без одного параметра")
 # Создание пользователя без указания одного из полей - с помощью @parametrize необходимо проверить, что отсутствие любого параметра не дает зарегистрировать пользователя
     @pytest.mark.parametrize('without_one_param', ((params_without_password),
                                                    (params_without_username),
@@ -108,6 +113,7 @@ class TestUserRegister(BaseCase):
         assert response.content.decode("utf-8") == f"The following required params are missed: {missed_params}", f"Непредвиденный содержание ответа {response.content}"
 
 # Создание пользователя с очень коротким именем в один символ
+    @allure.title("Создание пользователя с очень коротким именем в один символ")
     def test_name_in_one_character(self):
         firstName = 'l'
         data_1 = {
@@ -125,6 +131,7 @@ class TestUserRegister(BaseCase):
         assert response.content.decode("utf-8") == "The value of 'firstName' field is too short", f"Непредвиденный содержание ответа {response.content}"
 
 # Создание пользователя с очень длинным именем - длиннее 250 символов
+    @allure.title("Создание пользователя с очень длинным именем - длиннее 250 символов")
     def test_name_more_250_characters(self):
         firstName = "".join(choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") for i in range(260)) # генерация 260 символов в имене
         data_1 = {
